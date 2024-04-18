@@ -2,16 +2,16 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
-from tracker import *
-from datetime import datetime
+from tracker import Tracker
 import os
+
 fcount = 0
+
 def imgwrite(img):
     global fcount
     fcount += 1
     filename = '%s.png' % fcount
-    cv2.imwrite(os.path.join(r"C://Users//jummd//Downloads//imgs",filename), img)
-
+    cv2.imwrite(os.path.join(r"C://Users//jummd//Downloads//imgs", filename), img)
 
 def videoanalysis(video):
     cap = cv2.VideoCapture(video)
@@ -52,12 +52,17 @@ def videoanalysis(video):
                 list.append([x1, y1, x2, y2])
 
         bbox_idx = tracker.update(list)
+        save_frame = False
         for bbox in bbox_idx:
             x3, y3, x4, y4, id = bbox
             results = cv2.pointPolygonTest(np.array(area, np.int32), ((x4, y4)), False)
             cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 2)
             if results >= 0:
-                imgwrite(frame)
+                save_frame = True
+
+        if save_frame:
+            imgwrite(frame)
+        
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
